@@ -37,6 +37,11 @@
                     {% if filter.type == 'price_range' %}
                       <span class="text-sm"> ({{ cart.currency.iso_code }}) </span>
                     {% endif %}
+                    {% assign filter_key = filter.param_name | downcase %}
+
+                    {% if filter_key contains 'height' or filter_key contains 'width' %}
+                      <span class="text-sm">(cm)</span>
+                    {% endif %}
                   </h3>
 
                   {% if filter.type == 'price_range' %}
@@ -77,8 +82,6 @@
                       </div>
                     </div>
                   {% elsif filter.type == 'list' %}
-                    {% assign filter_key = filter.param_name | downcase %}
-
                     {% if filter_key contains 'height' or filter_key contains 'width' %}
                       {% assign has_active = false %}
                       {% for value in filter.values %}
