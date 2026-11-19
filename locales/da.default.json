@@ -1,0 +1,58 @@
+{
+  "404": {
+    "title": "404",
+    "not_found": "Siden blev ikke fundet.",
+    "back_to_shopping": "Tilbage til shoppen"
+  },
+  "blog": {
+    "article_comments": "Kommentarer",
+    "article_metadata_html": "{{ date }} af {{ author }}",
+    "comment_form_body": "Kommentar",
+    "comment_form_email": "E-mail",
+    "comment_form_name": "Navn",
+    "comment_form_submit": "Send",
+    "comment_form_title": "Skriv en kommentar"
+  },
+  "cart": {
+    "checkout": "Gå til betaling",
+    "title": "Indkøbskurv",
+    "update": "Opdater",
+    "remove": "Fjern"
+  },
+  "customers": {
+    "login": {
+      "email": "E-mail",
+      "password": "Adgangskode",
+      "submit": "Log ind",
+      "title": "Log ind"
+    }
+  },
+  "collections": {
+    "title": "Kollektioner",
+    "filters": "Filtre",
+    "apply_filters": "Anvend filtre",
+    "clear_filters": "Ryd filtre"
+  },
+  "products": {
+    "title": "Produkter"
+  },
+  "gift_card": {
+    "add_to_apple_wallet": "Føj til Apple Wallet",
+    "card": "Gavekort",
+    "expired": "Dette gavekort er udløbet",
+    "expires_on": "Udløber den {{ expires_on }}",
+    "use_at_checkout": "Brug dette gavekort ved betaling"
+  },
+  "password": {
+    "title": "Denne butik er privat",
+    "password": "Adgangskode",
+    "enter": "Fortsæt"
+  },
+  "search": {
+    "title": "Søg",
+    "placeholder": "Søg efter artikler, sider eller produkter",
+    "submit": "Søg",
+    "no_results_html": "Ingen resultater for {{ terms }}",
+    "results_for_html": "{{ count }} resultater for {{ terms }}"
+  }
+}

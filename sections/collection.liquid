@@ -1,0 +1,150 @@
+<script src="{{ 'collection-filter.js' |  asset_url }}" defer="defer"></script>
+
+{% liquid
+  assign has_active_filters = false
+
+  for filter in collection.filters
+    if filter.active_values.size > 0
+      assign has_active_filters = true
+      break
+    endif
+
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign has_active_filters = true
+        break
+      endif
+    endif
+  endfor
+%}
+
+<div class="flex flex-col gap-y-4">
+  <h1 class="text-2xl font-semibold text-foreground">{{ collection.title }}</h1>
+
+  <collection-filter data-section-id="{{ section.id }}" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <button
+      filters-open
+      type="button"
+      class="flex cursor-pointer items-center [&>svg]:w-6 bg-secondary-background py-2 justify-center rounded-full border-foreground border-2"
+    >
+      {{ 'icon-filter.svg' | inline_asset_content }}
+    </button>
+    <div filters-menu class="fixed inset-0 bg-black/60 items-center justify-center z-40 px-4">
+      <div class="bg-white w-full z-50 rounded-2xl max-w-xl">
+        <div class="flex items-center justify-between border-b border-bottom-color p-4">
+          <h2 class="text-2xl font-semibold">{{ 'collections.filters' | t }}</h2>
+          <button type="button" filters-close class="size-8 [&>svg]:size-full cursor-pointer">
+            {{ 'icon-menu-close.svg' | inline_asset_content }}
+          </button>
+        </div>
+
+        <div class="collection-filters flex flex-col p-4">
+          {% for filter in collection.filters %}
+            {% unless filter.param_name == 'filter.v.availability' %}
+              <div class="not-last:border-b border-bottom-color py-4">
+                <h3 class="text-lg mb-4!">
+                  {{ filter.label }}
+                  {% if filter.type == 'price_range' %}
+                    <span class="text-sm"> ({{ cart.currency.iso_code }}) </span>
+                  {% endif %}
+                </h3>
+
+                {% if filter.type == 'price_range' %}
+                  {% comment %}
+                    <form action="{{ collection.url }}" method="get" id="price-filter-{{section.id}}">
+                      <div class="flex gap-x-2 items-center bg-gray-100 border border-foreground rounded-full">
+                        <div class="flex bg-secondary-background px-4 py-2 rounded-full gap-x-2 flex-1 min-w-0">
+                          <label for="{{filter.min_value.param_name}}">Min</label>
+                          <input
+                            class="w-full min-w-0"
+                            type="number"
+                            name="{{filter.min_value.param_name}}"
+                            min="0"
+                            step="0.01"
+                            onchange="if (this.value !== '') this.value = Math.min(this.max, Math.max(this.min, Number(this.value)))"
+                            max="{{filter.range_max |  divided_by : 100.00}}"
+                            {% if filter.min_value.value != null %}
+                              value="{{ filter.min_value.value | divided_by: 100.00 }}"
+                            {% endif %}
+                          >
+                        </div>
+                        -
+                        <div class="flex bg-secondary-background px-4 py-2 rounded-full gap-x-2 flex-1 min-w-0">
+                          <label for="{{filter.max_value.param_name }}">Max</label>
+                          <input
+                            class="w-full min-w-0"
+                            type="number"
+                            name="{{filter.max_value.param_name}}"
+                            min="0"
+                            step="1"
+                            onchange="if (this.value !== '') this.value = Math.min(this.max, Math.max(this.min, Number(this.value)))"
+                            max="{{filter.range_max |  divided_by : 100.0}}"
+                            {% if filter.max_value.value != null %}
+                              value="{{ filter.max_value.value | divided_by: 100.0 }}"
+                            {% endif %}
+                          >
+                        </div>
+                      </div>
+                    </form>
+                  {% endcomment %}
+
+                {% elsif filter.type == 'list' %}
+                  <div class="flex flex-wrap gap-3">
+                    {% for value in filter.values %}
+                      {% if filter.presentation == 'swatch' %}
+                        {% if value.swatch.color %}
+                          <input
+                            type="checkbox"
+                            id="{{filter.label | handle }}-{{ value.value | handle }}"
+                            name="{{ filter.param_name |  escape }}"
+                            value="{{ value.value | escape }}"
+                            {% if value.active %}
+                              checked
+                            {% endif %}
+                            style="background-color: {{ value.swatch.color }};"
+                            class="size-10 appearance-none rounded-full! border border-black/20 cursor-pointer checked:ring-offset-2 checked:ring-2 checked:ring-foreground"
+                          />
+                        {% endif %}
+                      {% endif %}
+                    {%- endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endunless %}
+          {% endfor %}
+        </div>
+        <div class="border-t border-bottom-color p-4 flex gap-x-4">
+          <button
+            type="button"
+            class="cursor-pointer bg-footer text-white p-4 rounded-2xl flex-1"
+            filters-close
+          >
+            {{ 'collections.apply_filters' | t }}
+          </button>
+          <button
+            filters-clear
+            class="bg-secondary-background cursor-pointer text-sm px-4 py-2 rounded-2xl flex-1"
+            {% unless has_active_filters %}
+              disabled
+            {% endunless %}
+          >
+            {{ 'collections.clear_filters' | t }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </collection-filter>
+  <div class="collection-products grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+    {% for product in collection.products %}
+      <div class="p-2 bg-white rounded-2xl shadow">
+        <a href="{{ product.url }}">
+          {{ product.featured_image | image_url: width: 900 | image_tag }}
+          <p class="text-center font-medium">{{ product.title }}</p>
+          <p class="text-center text-sm">
+            {{- product.price | money -}}
+          </p>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</div>

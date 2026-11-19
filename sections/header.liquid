@@ -1,0 +1,124 @@
+<script src="{{ 'main-header.js' |  asset_url }}" defer="defer"></script>
+
+<main-header class="flex items-center py-4 justify-between">
+  <button type="button" menu-open class="size-10 [&>svg]:size-full md:hidden">
+    {{ 'icon-menu-open.svg' | inline_asset_content }}
+  </button>
+
+  <div class="w-12">
+    {{ shop.brand.logo | image_url: width: 200 | image_tag | link_to: routes.root_url }}
+  </div>
+
+  <nav class="hidden md:flex gap-x-8">
+    {% for link in linklists['main-menu'].links %}
+      <div class="relative group">
+        <a href="{{ link.url }}" class="flex items-center gap-2">
+          <span class="uppercase font-semibold">
+            {{ link.title }}
+          </span>
+
+          {% if link.links.size > 0 %}
+            {{ 'icon-chevron-down.svg' | inline_asset_content }}
+          {% endif %}
+        </a>
+
+        {% if link.links.size > 0 %}
+          <div class="hidden absolute top-full left-full -translate-x-1/2 z-50 w-max min-w-full pt-4 group-hover:block group-focus-within:block">
+            <div class="flex flex-col gap-3 bg-white p-4 shadow-lg rounded-md">
+              {% for child in link.links %}
+                <a href="{{ child.url }}" class="whitespace-nowrap hover:underline">
+                  {{ child.title }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </nav>
+
+  <div
+    mobile-menu
+    class="hidden fixed h-dvh w-full z-50 inset-0 flex-col overflow-y-auto bg-background"
+  >
+    <div class="w-full text-right p-4">
+      <button type="button" menu-close class="size-10 [&>svg]:size-full">
+        {{ 'icon-menu-close.svg' | inline_asset_content }}
+      </button>
+    </div>
+    <nav class="px-4 relative space-y-2!">
+      {% for link in linklists['main-menu'].links %}
+        <div class="border-b-[#A7B5A3] border-b pb-2 last:border-b-0">
+          <div class="flex justify-between items-center">
+            <a href="{{ link.url }}">
+              <h2 class="text-2xl uppercase font-semibold">
+                {{ link.title }}
+              </h2>
+            </a>
+            <button sub-menu-open type="button" class="size-6! [&>svg]:size-full!">
+              {{ 'icon-plus.svg' | inline_asset_content }}
+            </button>
+          </div>
+          <div
+            sub-menu-mobile
+            class="hidden flex-col fixed z-50 inset-0 overflow-y-auto bg-background"
+          >
+            <div class="flex justify-between p-4">
+              <button
+                type="button"
+                class="[&>svg]:size-10 flex items-center"
+                sub-menu-close
+              >
+                {{ 'icon-chevron-left.svg' | inline_asset_content }}
+                <span>Back</span>
+              </button>
+              <button type="button" menu-close class="size-10 [&>svg]:size-full">
+                {{ 'icon-menu-close.svg' | inline_asset_content }}
+              </button>
+            </div>
+            <div class="px-4 space-y-2!">
+              {% for child in link.links %}
+                <div class="border-b-[#A7B5A3] border-b pb-2 last:border-b-0">
+                  <h3 class="text-2xl uppercase font-semibold">
+                    <a href="{{ child.url }}">
+                      {{ child.title }}
+                    </a>
+                  </h3>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {%- endfor %}
+    </nav>
+  </div>
+
+  <div class="flex items-center">
+    <div class="relative size-10">
+      <a href="{{ routes.cart_url }}" class="block size-full [&>svg]:size-full">
+        <img
+          src="{{ 'icon-cart.png' | asset_url }}"
+          alt="cart"
+          class="h-10!"
+          height="40"
+          width="auto"
+        >
+
+        {% if cart.item_count > 0 %}
+          <span class="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 flex size-5 items-center justify-center rounded-full bg-foreground text-xs text-white">
+            {{ cart.item_count }}
+          </span>
+        {% endif %}
+      </a>
+    </div>
+  </div>
+</main-header>
+
+{% stylesheet %}
+  .shopify-section:has(> main-header) {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: white;
+  }
+{% endstylesheet %}

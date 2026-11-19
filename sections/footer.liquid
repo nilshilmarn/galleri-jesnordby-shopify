@@ -1,0 +1,62 @@
+{% assign instagram = shop.brand.metafields.social_links.instagram.value %}
+{% assign facebook = shop.brand.metafields.social_links.facebook.value %}
+{% assign linkedin = shop.brand.metafields.social_links.linkedin.value %}
+
+<footer class="bg-footer full-width">
+  <div class="max-w-7xl mx-auto! px-4 py-4 flex flex-col gap-y-4">
+    <div class="w-full flex items-center justify-center gap-x-4 [&_svg]:size-6 text-white border-b border-b-[#3C3E29] pb-4">
+      {% if instagram != blank %}
+        <a
+          href="{{ instagram }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-x-1"
+        >
+          {{ 'icon-instagram.svg' | inline_asset_content }}
+          Instagram
+        </a>
+      {% endif %}
+
+      {% if facebook != blank %}
+        <a
+          href="{{ facebook }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-x-1"
+        >
+          {{ 'icon-facebook.svg' | inline_asset_content }}
+          Facebook
+        </a>
+      {% endif %}
+
+      {% if linkedin != blank %}
+        <a
+          href="{{ linkedin }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-x-1"
+        >
+          {{ 'icon-linkedin.svg' | inline_asset_content }}
+          LinkedIn
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="flex flex-wrap gap-4 justify-between">
+      {% for link in linklists.footer.links %}
+        <div>
+          <h3 class="text-2xl text-heading uppercase font-semibold mb-2!">
+            {{ link.title | link_to: link.url }}
+          </h3>
+          <ul class="space-y-2!">
+            {% for child in link.links %}
+              <li class="text-white text-base">
+                {{ child.title | link_to: child.url }}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</footer>

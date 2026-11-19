@@ -1,0 +1,76 @@
+{
+  "general": {
+    "404": "Side ikke fundet",
+    "article": "Artikel",
+    "block": "Blok",
+    "blog": "Blog",
+    "cart": "Indkøbskurv",
+    "collection": "Kollektion",
+    "collections": "Kollektioner",
+    "collection_card": "Kollektionskort",
+    "collections_grid": "Kollektionsgitter",
+    "colors": "Farver",
+    "column": "Kolonne",
+    "content": "Indhold",
+    "custom_section": "Brugerdefineret sektion",
+    "fonts": "Skrifttyper",
+    "footer": "Sidefod",
+    "group": "Gruppe",
+    "header": "Sidehoved",
+    "layout": "Layout",
+    "main": "Hovedindhold",
+    "page": "Side",
+    "password": "Adgangskode",
+    "primary": "Primær",
+    "product": "Produkt",
+    "row": "Række",
+    "search": "Søgning",
+    "secondary": "Sekundær",
+    "section": "Sektion",
+    "settings": "Indstillinger",
+    "sidebar": "Sidepanel",
+    "text": "Tekst",
+    "theme": "Tema",
+    "typography": "Typografi"
+  },
+  "labels": {
+    "alignment": "Justering",
+    "background": "Baggrund",
+    "foreground": "Forgrund",
+    "grid_gap": "Afstand mellem gitterelementer",
+    "grid_item_width": "Gitterelementets bredde",
+    "input_corner_radius": "Hjørneafrunding på inputfelter",
+    "layout_direction": "Layoutretning",
+    "menu": "Menu",
+    "padding": "Indvendig afstand",
+    "page_margin": "Sidemargen",
+    "page_width": "Sidebredde",
+    "show_payment_icons": "Vis betalingsikoner",
+    "text_style": "Tekststil",
+    "text": "Tekst"
+  },
+  "options": {
+    "alignment": {
+      "left": "Venstre",
+      "center": "Centreret",
+      "right": "Højre"
+    },
+    "direction": {
+      "horizontal": "Vandret",
+      "vertical": "Lodret"
+    },
+    "page_width": {
+      "narrow": "Smal",
+      "wide": "Bred"
+    },
+    "size": {
+      "large": "Stor",
+      "small": "Lille"
+    },
+    "text_style": {
+      "title": "Overskrift",
+      "subtitle": "Underoverskrift",
+      "normal": "Normal tekst"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme inline {
+    --color-background: var(--color-background);
+    --color-foreground: var(--color-foreground);
+    --color-footer: var(--color-footer);
+    --color-heading: var(--color-heading);
+    --color-secondary-background: var(--color-secondary-background);
+    --color-bottom-color: var(--color-bottom-color);
+
+}
