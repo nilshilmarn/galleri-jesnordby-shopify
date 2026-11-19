@@ -13,3 +13,5 @@
 #   /(templates|sections)/.*\.json/
 
 node_modules/*
+dandomain/*
+.env

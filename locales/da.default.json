@@ -31,7 +31,8 @@
     "title": "Kollektioner",
     "filters": "Filtre",
     "apply_filters": "Anvend filtre",
-    "clear_filters": "Ryd filtre"
+    "clear_filters": "Ryd filtre",
+    "of": "ud af"
   },
   "products": {
     "title": "Produkter"

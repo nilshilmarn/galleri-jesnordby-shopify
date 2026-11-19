@@ -1,150 +1,211 @@
 <script src="{{ 'collection-filter.js' |  asset_url }}" defer="defer"></script>
 
-{% liquid
-  assign has_active_filters = false
-
-  for filter in collection.filters
-    if filter.active_values.size > 0
-      assign has_active_filters = true
-      break
-    endif
-
-    if filter.type == 'price_range'
-      if filter.min_value.value != null or filter.max_value.value != null
-        assign has_active_filters = true
-        break
-      endif
-    endif
-  endfor
-%}
-
 <div class="flex flex-col gap-y-4">
-  <h1 class="text-2xl font-semibold text-foreground">{{ collection.title }}</h1>
+  <h1 class="text-4xl font-semibold text-foreground">{{ collection.title }}</h1>
 
-  <collection-filter data-section-id="{{ section.id }}" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-    <button
-      filters-open
-      type="button"
-      class="flex cursor-pointer items-center [&>svg]:w-6 bg-secondary-background py-2 justify-center rounded-full border-foreground border-2"
-    >
-      {{ 'icon-filter.svg' | inline_asset_content }}
-    </button>
-    <div filters-menu class="fixed inset-0 bg-black/60 items-center justify-center z-40 px-4">
-      <div class="bg-white w-full z-50 rounded-2xl max-w-xl">
-        <div class="flex items-center justify-between border-b border-bottom-color p-4">
-          <h2 class="text-2xl font-semibold">{{ 'collections.filters' | t }}</h2>
-          <button type="button" filters-close class="size-8 [&>svg]:size-full cursor-pointer">
-            {{ 'icon-menu-close.svg' | inline_asset_content }}
-          </button>
-        </div>
+  <div class="collection">
+    <collection-filter data-section-id="{{ section.id }}" class="flex  justify-between items-center mb-8!">
+      <button
+        filters-open
+        type="button"
+        class="flex cursor-pointer items-center [&>svg]:w-6 gap-x-2 border rounded-2xl px-4 py-2"
+      >
+        {{ 'icon-filter.svg' | inline_asset_content }}
+        {{ 'collections.filters' | t }}
+      </button>
+      <p>
+        {{ collection.products_count }}
+        {{ 'collections.of' | t }}
+        {{ collection.all_products_count }}
+        {{ 'products.title' | t | downcase }}
+      </p>
+      <div filters-menu class="fixed flex inset-0 bg-black/60 items-center justify-center z-40 px-4">
+        <div class="bg-white w-full z-50 rounded-2xl max-w-xl">
+          <div class="flex items-center justify-between border-b border-bottom-color p-4">
+            <h2 class="text-2xl font-semibold">{{ 'collections.filters' | t }}</h2>
+            <button type="button" filters-close class="size-8 [&>svg]:size-full cursor-pointer">
+              {{ 'icon-menu-close.svg' | inline_asset_content }}
+            </button>
+          </div>
 
-        <div class="collection-filters flex flex-col p-4">
-          {% for filter in collection.filters %}
-            {% unless filter.param_name == 'filter.v.availability' %}
-              <div class="not-last:border-b border-bottom-color py-4">
-                <h3 class="text-lg mb-4!">
-                  {{ filter.label }}
+          <div class=" flex flex-col p-4">
+            {% for filter in collection.filters %}
+              {% unless filter.param_name == 'filter.v.availability' %}
+                <div class="not-last:border-b border-bottom-color py-4">
+                  <h3 class="text-lg mb-4!">
+                    {{ filter.label }}
+                    {% if filter.type == 'price_range' %}
+                      <span class="text-sm"> ({{ cart.currency.iso_code }}) </span>
+                    {% endif %}
+                  </h3>
+
                   {% if filter.type == 'price_range' %}
-                    <span class="text-sm"> ({{ cart.currency.iso_code }}) </span>
-                  {% endif %}
-                </h3>
+                    <div class="flex gap-x-4">
+                      <div class="flex flex-1 min-w-0 items-center gap-x-2">
+                        <label for="price-min">Min</label>
+                        <input
+                          id="price-min"
+                          name="{{ filter.min_value.param_name }}"
+                          type="number"
+                          min="0"
+                          class="w-full min-w-0 px-3 py-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                          {% if filter.min_value.value %}
+                            value="{{ filter.min_value.value | divided_by: 100.0 }}"
+                          {% else %}
+                            value="0"
+                          {% endif %}
+                          data-param="{{ filter.min_value.param_name }}"
+                          data-min-value
+                        />
+                      </div>
+                      <div class="flex flex-1 min-w-0 items-center gap-x-2">
+                        <label for="price-max">Max</label>
+                        <input
+                          id="price-max"
+                          name="{{ filter.max_value.param_name }}"
+                          type="number"
+                          min="0"
+                          class="w-full min-w-0 px-3 py-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                          {% if filter.max_value.value %}
+                            value="{{ filter.max_value.value | divided_by: 100.0 }}"
+                          {% else %}
+                            value="{{ filter.range_max | divided_by: 100.0 }}"
+                          {% endif %}
+                          data-param="{{ filter.max_value.param_name }}"
+                          data-max-value
+                        />
+                      </div>
+                    </div>
+                  {% elsif filter.type == 'list' %}
+                    {% assign filter_key = filter.param_name | downcase %}
 
-                {% if filter.type == 'price_range' %}
-                  {% comment %}
-                    <form action="{{ collection.url }}" method="get" id="price-filter-{{section.id}}">
-                      <div class="flex gap-x-2 items-center bg-gray-100 border border-foreground rounded-full">
-                        <div class="flex bg-secondary-background px-4 py-2 rounded-full gap-x-2 flex-1 min-w-0">
-                          <label for="{{filter.min_value.param_name}}">Min</label>
+                    {% if filter_key contains 'height' or filter_key contains 'width' %}
+                      {% assign has_active = false %}
+                      {% for value in filter.values %}
+                        {% assign n = value.value | times: 1.0 %}
+                        {% if forloop.first %}
+                          {% assign range_min = n -%}
+                          {%- assign range_min_label = value.value %}
+                          {% assign range_max = n -%}
+                          {%- assign range_max_label = value.value %}
+                        {% else %}
+                          {% if n < range_min -%}
+                            {%- assign range_min = n -%}
+                            {%- assign range_min_label = value.value -%}
+                          {%- endif %}
+                          {% if n > range_max -%}
+                            {%- assign range_max = n -%}
+                            {%- assign range_max_label = value.value -%}
+                          {%- endif %}
+                        {% endif %}
+                        {% if value.active %}
+                          {% if has_active == false %}
+                            {% assign active_min = n -%}
+                            {%- assign active_min_label = value.value %}
+                            {% assign active_max = n -%}
+                            {%- assign active_max_label = value.value %}
+                            {% assign has_active = true %}
+                          {% else %}
+                            {% if n < active_min -%}
+                              {%- assign active_min = n -%}
+                              {%- assign active_min_label = value.value -%}
+                            {%- endif %}
+                            {% if n > active_max -%}
+                              {%- assign active_max = n -%}
+                              {%- assign active_max_label = value.value -%}
+                            {%- endif %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+
+                      <div
+                        class="flex gap-x-4"
+                        data-list-range
+                        data-param="{{ filter.param_name | escape }}"
+                        data-values="{{ filter.values | map: 'value' | json | escape }}"
+                      >
+                        <div class="flex flex-1 min-w-0 items-center gap-x-2">
+                          <label for="{{ filter.label | handle }}-min">Min</label>
                           <input
-                            class="w-full min-w-0"
+                            id="{{ filter.label | handle }}-min"
                             type="number"
-                            name="{{filter.min_value.param_name}}"
                             min="0"
-                            step="0.01"
-                            onchange="if (this.value !== '') this.value = Math.min(this.max, Math.max(this.min, Number(this.value)))"
-                            max="{{filter.range_max |  divided_by : 100.00}}"
-                            {% if filter.min_value.value != null %}
-                              value="{{ filter.min_value.value | divided_by: 100.00 }}"
-                            {% endif %}
-                          >
+                            step="any"
+                            value="{% if has_active %}{{ active_min_label }}{% else %}{{ range_min_label }}{% endif %}"
+                            class="w-full min-w-0 px-3 py-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            data-list-range-min
+                          />
                         </div>
-                        -
-                        <div class="flex bg-secondary-background px-4 py-2 rounded-full gap-x-2 flex-1 min-w-0">
-                          <label for="{{filter.max_value.param_name }}">Max</label>
+                        <div class="flex flex-1 min-w-0 items-center gap-x-2">
+                          <label for="{{ filter.label | handle }}-max">Max</label>
                           <input
-                            class="w-full min-w-0"
+                            id="{{ filter.label | handle }}-max"
                             type="number"
-                            name="{{filter.max_value.param_name}}"
                             min="0"
-                            step="1"
-                            onchange="if (this.value !== '') this.value = Math.min(this.max, Math.max(this.min, Number(this.value)))"
-                            max="{{filter.range_max |  divided_by : 100.0}}"
-                            {% if filter.max_value.value != null %}
-                              value="{{ filter.max_value.value | divided_by: 100.0 }}"
-                            {% endif %}
-                          >
+                            step="any"
+                            value="{% if has_active %}{{ active_max_label }}{% else %}{{ range_max_label }}{% endif %}"
+                            class="w-full min-w-0 px-3 py-2 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                            data-list-range-max
+                          />
                         </div>
                       </div>
-                    </form>
-                  {% endcomment %}
 
-                {% elsif filter.type == 'list' %}
-                  <div class="flex flex-wrap gap-3">
-                    {% for value in filter.values %}
-                      {% if filter.presentation == 'swatch' %}
-                        {% if value.swatch.color %}
-                          <input
-                            type="checkbox"
-                            id="{{filter.label | handle }}-{{ value.value | handle }}"
-                            name="{{ filter.param_name |  escape }}"
-                            value="{{ value.value | escape }}"
-                            {% if value.active %}
-                              checked
-                            {% endif %}
-                            style="background-color: {{ value.swatch.color }};"
-                            class="size-10 appearance-none rounded-full! border border-black/20 cursor-pointer checked:ring-offset-2 checked:ring-2 checked:ring-foreground"
-                          />
-                        {% endif %}
-                      {% endif %}
-                    {%- endfor %}
-                  </div>
-                {% endif %}
-              </div>
-            {% endunless %}
-          {% endfor %}
-        </div>
-        <div class="border-t border-bottom-color p-4 flex gap-x-4">
-          <button
-            type="button"
-            class="cursor-pointer bg-footer text-white p-4 rounded-2xl flex-1"
-            filters-close
-          >
-            {{ 'collections.apply_filters' | t }}
-          </button>
-          <button
-            filters-clear
-            class="bg-secondary-background cursor-pointer text-sm px-4 py-2 rounded-2xl flex-1"
-            {% unless has_active_filters %}
-              disabled
-            {% endunless %}
-          >
-            {{ 'collections.clear_filters' | t }}
-          </button>
+                    {% else %}
+                      <div class="flex flex-wrap gap-3">
+                        {% for value in filter.values %}
+                          {% if filter.presentation == 'swatch' and value.swatch.color %}
+                            <input
+                              type="checkbox"
+                              id="{{ filter.label | handle }}-{{ value.value | handle }}"
+                              name="{{ filter.param_name | escape }}"
+                              value="{{ value.value | escape }}"
+                              data-add-url="{{ value.url_to_add }}"
+                              data-remove-url="{{ value.url_to_remove }}"
+                              {% if value.active %}
+                                checked
+                              {% endif %}
+                              style="background-color: {{ value.swatch.color }};"
+                              class="size-10 appearance-none rounded-full! border border-black/20 cursor-pointer checked:ring-offset-2 checked:ring-2 checked:ring-foreground"
+                            />
+                          {% endif %}
+                        {%- endfor %}
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              {%- endunless %}
+            {% endfor %}
+          </div>
+          <div class="border-t border-bottom-color p-4 flex gap-x-4">
+            <button
+              type="button"
+              class="cursor-pointer bg-footer text-white p-4 rounded-2xl flex-1"
+              filters-close
+            >
+              {{ 'collections.apply_filters' | t }}
+            </button>
+            <button
+              filters-clear
+              class="bg-secondary-background cursor-pointer text-sm px-4 py-2 rounded-2xl flex-1"
+            >
+              {{ 'collections.clear_filters' | t }}
+            </button>
+          </div>
         </div>
       </div>
+    </collection-filter>
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      {% for product in collection.products %}
+        <div class="p-2 bg-white rounded-2xl shadow">
+          <a href="{{ product.url }}">
+            {{ product.featured_image | image_url: width: 450 | image_tag }}
+            <p class="text-center font-medium">{{ product.title }}</p>
+            <p class="text-center text-sm">
+              {{- product.price | money -}}
+            </p>
+          </a>
+        </div>
+      {% endfor %}
     </div>
-  </collection-filter>
-  <div class="collection-products grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-    {% for product in collection.products %}
-      <div class="p-2 bg-white rounded-2xl shadow">
-        <a href="{{ product.url }}">
-          {{ product.featured_image | image_url: width: 900 | image_tag }}
-          <p class="text-center font-medium">{{ product.title }}</p>
-          <p class="text-center text-sm">
-            {{- product.price | money -}}
-          </p>
-        </a>
-      </div>
-    {% endfor %}
   </div>
 </div>

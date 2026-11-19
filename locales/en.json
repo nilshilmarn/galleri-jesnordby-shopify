@@ -31,7 +31,8 @@
     "title": "Collections",
     "filters": "Filters",
     "apply_filters": "Apply filters",
-    "clear_filters": "Clear filters"
+    "clear_filters": "Clear filters",
+    "of": "of"
   },
   "products": {
     "title": "Products"
